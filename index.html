@@ -129,12 +129,16 @@ const premios = [
   "500.000 de Gemas 💎"
 ];
 
+let caixaJaAberta = false;
+
 function verificarKey() {
   const key = keyInput.value.trim();
 
   if (key === PERMANENT_KEY) {
     resultado.innerText = "✅ Key permanente aceita! Abra sua caixa.";
     abrir.style.display = "inline-block";
+    caixaJaAberta = false;
+    abrir.disabled = false;
     return;
   }
 
@@ -143,20 +147,32 @@ function verificarKey() {
     return;
   }
 
-  if (localStorage.getItem(key)) {
+  if (localStorage.getItem("used_" + key)) {
     resultado.innerText = "❌ Essa key já foi usada.";
     return;
   }
 
   resultado.innerText = "✅ Key válida! Abra sua caixa.";
   abrir.style.display = "inline-block";
+  caixaJaAberta = false;
+  abrir.disabled = false;
 }
 
 function abrirCaixa() {
+  if (caixaJaAberta) {
+    resultado.innerText = "❌ Você já abriu essa caixa.";
+    return;
+  }
+
+  caixaJaAberta = true;
+
   const caixa = document.getElementById("caixa");
   caixa.style.display = "block";
   caixa.classList.add("chacoalhar");
   resultado.innerText = "";
+  abrir.disabled = true;
+  abrir.style.opacity = "0.6";
+  abrir.style.cursor = "not-allowed";
 
   for (let i = 0; i < 20; i++) {
     const f = document.createElement("div");
@@ -174,7 +190,7 @@ function abrirCaixa() {
 
     const key = keyInput.value.trim();
     if (key !== PERMANENT_KEY) {
-      localStorage.setItem(key, "usada");
+      localStorage.setItem("used_" + key, "true");
     }
   }, 3000);
 }
